@@ -25,9 +25,13 @@ PORT = int(os.getenv('PORT', 5000))
 
 # Configure database
 db_url = os.getenv('DATABASE_URL', 'sqlite:///unilog.db')
-if db_url.startswith('postgres://') or db_url.startswith('postgresql://'):
+if 'postgresql' in db_url or 'postgres' in db_url:
     if db_url.startswith('postgres://'):
         db_url = db_url.replace('postgres://', 'postgresql://', 1)
+    if 'postgresql+pg8000://' in db_url:
+        db_url = db_url.replace('postgresql+pg8000://', 'postgresql://', 1)
+    elif 'postgresql+psycopg2://' in db_url:
+        db_url = db_url.replace('postgresql+psycopg2://', 'postgresql://', 1)
     try:
         import psycopg2
     except ImportError:
