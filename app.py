@@ -26,6 +26,21 @@ PORT = int(os.getenv('PORT', 5000))
 # Configure database
 db_url = os.getenv('DATABASE_URL', 'sqlite:///unilog.db')
 if 'postgresql' in db_url or 'postgres' in db_url:
+    # URL-encode spaces in password/username if present
+    if ' ' in db_url:
+        parts = db_url.split('@', 1)
+        if len(parts) == 2:
+            creds, host = parts
+            proto_parts = creds.split('://', 1)
+            if len(proto_parts) == 2:
+                proto, user_pass = proto_parts
+                user_pass_parts = user_pass.split(':', 1)
+                if len(user_pass_parts) == 2:
+                    username, password = user_pass_parts
+                    import urllib.parse
+                    encoded_pass = urllib.parse.quote(password)
+                    db_url = f"{proto}://{username}:{encoded_pass}@{host}"
+
     if db_url.startswith('postgres://'):
         db_url = db_url.replace('postgres://', 'postgresql://', 1)
     if 'postgresql+pg8000://' in db_url:
