@@ -303,6 +303,11 @@ def seed_database():
         ))
     db.session.commit()
 
+# Ensure database tables exist and are seeded on startup (runs under Gunicorn/Render too)
+with app.app_context():
+    db.create_all()
+    seed_database()
+
 # --- Authentication APIs ---
 
 # User Login
